@@ -1,0 +1,33 @@
+{
+  "name": "prompt-to-gif",
+  "version": "1.0.0",
+  "description": "Generate GIF images from text prompts using AI",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js",
+    "client": "cd frontend && npm start",
+    "build": "cd frontend && npm run build"
+  },
+  "keywords": [
+    "gif",
+    "prompt",
+    "ai",
+    "image-generation"
+  ],
+  "author": "baxleychris543-code",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.3",
+    "axios": "^1.4.0",
+    "gif-encoder": "^0.7.2",
+    "canvas": "^2.11.2",
+    "multer": "^1.4.5-lts.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}
