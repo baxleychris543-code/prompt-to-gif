@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prompt to GIF Generator - Offline</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+            margin-bottom: 10px;
+        }
+
+        .offline-badge {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            margin-top: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        main {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .input-section {
+            padding: 40px;
+            background: #f8f9fa;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .output-section {
+            padding: 40px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .form-group textarea,
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1em;
+            font-family: inherit;
+            transition: border-color 0.3s;
+        }
+
+        .form-group textarea:focus,
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-top: 30px;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #e0e0e0;
+            color: #333;
+        }
+
+        .btn-secondary:hover:not(:disabled) {
+            background: #d0d0d0;
+        }
+
+        .btn-small {
+            flex: none;
+            padding: 8px 20px;
+            font-size: 0.9em;
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        #loadingText {
+            font-size: 1.1em;
+            color: #666;
+        }
+
+        .preview-container,
+        .result-container {
+            text-align: center;
+        }
+
+        .preview-container h2,
+        .result-container h2 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .output-image {
+            max-width: 100%;
+            height: auto;
+            border-radius: 12px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            margin-bottom: 25px;
+        }
+
+        .download-section {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .error-message {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            color: #856404;
+        }
+
+        #errorText {
+            margin-bottom: 15px;
+        }
+
+        .info-message {
+            background: #d1ecf1;
+            border: 2px solid #0c5460;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            color: #0c5460;
+        }
+
+        footer {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.8);
+            margin-top: 30px;
+            padding-top: 20px;
+        }
+
+        @media (max-width: 600px) {
+            header h1 {
+                font-size: 1.8em;
+            }
+
+            .input-section {
+                padding: 20px;
+            }
+
+            .output-section {
+                padding: 20px;
+            }
+
+            .btn {
+                flex: 1;
+                min-width: 100%;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎬 Prompt to GIF Generator</h1>
+            <p>Transform your imagination into animated GIFs with AI</p>
+            <div class="offline-badge">📌 Offline Mode - Create custom animations locally</div>
+        </header>
+
+        <main>
+            <section class="input-section">
+                <div class="info-message">
+                    <strong>ℹ️ Note:</strong> This offline version creates GIFs from solid colors with text. For AI-generated images, use the online version at <code>http://localhost:3000</code>
+                </div>
+
+                <form id="gifForm">
+                    <div class="form-group">
+                        <label for="prompt">Enter Your Prompt/Description:</label>
+                        <textarea 
+                            id="prompt" 
+                            placeholder="Describe what you want in your animation... (e.g., 'Colorful gradient animation')"
+                            rows="3"
+                            required
+                        ></textarea>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="frames">Number of Frames:</label>
+                            <input 
+                                type="number" 
+                                id="frames" 
+                                min="2" 
+                                max="20" 
+                                value="5"
+                            >
+                        </div>
+
+                        <div class="form-group">
+                            <label for="duration">Frame Duration (ms):</label>
+                            <input 
+                                type="number" 
+                                id="duration" 
+                                min="50" 
+                                max="500" 
+                                value="100"
+                                step="10"
+                            >
+                        </div>
+
+                        <div class="form-group">
+                            <label for="animation">Animation Type:</label>
+                            <select id="animation">
+                                <option value="pulse">Pulsing Color</option>
+                                <option value="gradient">Gradient Flow</option>
+                                <option value="rainbow">Rainbow Cycle</option>
+                                <option value="fade">Fade In/Out</option>
+                                <option value="rotate">Rotating Hue</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="button-group">
+                        <button type="submit" id="generateBtn" class="btn btn-primary">
+                            ✨ Generate GIF
+                        </button>
+                    </div>
+                </form>
+            </section>
+
+            <section class="output-section">
+                <div id="loading" class="loading" style="display: none;">
+                    <div class="spinner"></div>
+                    <p id="loadingText">Generating your GIF...</p>
+                </div>
+
+                <div id="result" class="result-container" style="display: none;">
+                    <h2>Your Generated GIF</h2>
+                    <canvas id="previewCanvas" class="output-image" style="border: 1px solid #ccc;"></canvas>
+                    <div class="download-section">
+                        <button id="downloadBtn" class="btn btn-primary">
+                            ⬇️ Download GIF
+                        </button>
+                        <button id="newBtn" class="btn btn-secondary">
+                            🔄 Generate Another
+                        </button>
+                    </div>
+                </div>
+
+                <div id="error" class="error-message" style="display: none;">
+                    <p id="errorText"></p>
+                    <button onclick="hideError()" class="btn btn-small">Dismiss</button>
+                </div>
+            </section>
+        </main>
+
+        <footer>
+            <p>Made with ❤️ by prompt-to-gif | Offline Edition</p>
+        </footer>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/gif.js@0.2.0/dist/gif.js"></script>
+    <script>
+        // DOM Elements
+        const gifForm = document.getElementById('gifForm');
+        const promptInput = document.getElementById('prompt');
+        const framesInput = document.getElementById('frames');
+        const durationInput = document.getElementById('duration');
+        const animationInput = document.getElementById('animation');
+        const generateBtn = document.getElementById('generateBtn');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const newBtn = document.getElementById('newBtn');
+
+        const loadingDiv = document.getElementById('loading');
+        const resultDiv = document.getElementById('result');
+        const errorDiv = document.getElementById('error');
+        const previewCanvas = document.getElementById('previewCanvas');
+        const loadingText = document.getElementById('loadingText');
+        const errorText = document.getElementById('errorText');
+
+        let currentGif = null;
+
+        // Event Listeners
+        gifForm.addEventListener('submit', handleGenerateGif);
+        downloadBtn.addEventListener('click', handleDownload);
+        newBtn.addEventListener('click', resetForm);
+
+        /**
+         * Generate color based on animation type
+         */
+        function getColorForFrame(frameIndex, totalFrames, animationType) {
+            const progress = frameIndex / totalFrames;
+            
+            switch(animationType) {
+                case 'pulse':
+                    const intensity = Math.sin(progress * Math.PI * 2) * 127 + 128;
+                    return `rgb(102, 126, 234, ${intensity / 255})`;
+                
+                case 'gradient':
+                    const r = Math.floor(100 + progress * 155);
+                    const g = Math.floor(126 + (Math.sin(progress * Math.PI * 2) * 50));
+                    const b = Math.floor(234 - progress * 100);
+                    return `rgb(${r}, ${g}, ${b})`;
+                
+                case 'rainbow':
+                    const hue = (progress * 360) % 360;
+                    return `hsl(${hue}, 100%, 50%)`;
+                
+                case 'fade':
+                    const opacity = frameIndex < totalFrames / 2 
+                        ? (frameIndex / (totalFrames / 2)) 
+                        : (1 - (frameIndex - totalFrames / 2) / (totalFrames / 2));
+                    return `rgba(102, 126, 234, ${opacity})`;
+                
+                case 'rotate':
+                    const hueRotate = (progress * 360) % 360;
+                    return `hsl(${hueRotate}, 80%, 60%)`;
+                
+                default:
+                    return '#667eea';
+            }
+        }
+
+        /**
+         * Handle GIF generation
+         */
+        async function handleGenerateGif(e) {
+            e.preventDefault();
+
+            const prompt = promptInput.value.trim();
+            if (!prompt) {
+                showError('Please enter a prompt');
+                return;
+            }
+
+            const frames = parseInt(framesInput.value) || 5;
+            const duration = parseInt(durationInput.value) || 100;
+            const animationType = animationInput.value;
+
+            if (frames < 2 || frames > 20) {
+                showError('Frames must be between 2 and 20');
+                return;
+            }
+
+            try {
+                showLoading('Generating your GIF...');
+                resultDiv.style.display = 'none';
+
+                // Create GIF with gif.js library
+                const gif = new GIF({
+                    workers: 2,
+                    quality: 10,
+                    width: 512,
+                    height: 512,
+                    workerScript: 'https://cdn.jsdelivr.net/npm/gif.js@0.2.0/dist/gif.worker.js'
+                });
+
+                // Generate frames
+                for (let i = 0; i < frames; i++) {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = 512;
+                    canvas.height = 512;
+                    const ctx = canvas.getContext('2d');
+
+                    // Get color for this frame
+                    const color = getColorForFrame(i, frames, animationType);
+
+                    // Draw background
+                    ctx.fillStyle = color;
+                    ctx.fillRect(0, 0, 512, 512);
+
+                    // Draw text
+                    ctx.fillStyle = 'white';
+                    ctx.font = 'bold 24px Arial';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
+                    ctx.shadowBlur = 10;
+                    ctx.fillText(prompt, 256, 200);
+                    ctx.fillText(`Frame ${i + 1}/${frames}`, 256, 260);
+
+                    // Add frame to GIF
+                    gif.addFrame(canvas, { delay: duration });
+                }
+
+                // On finish, display the GIF
+                gif.on('finished', function(blob) {
+                    currentGif = blob;
+                    const gifUrl = URL.createObjectURL(blob);
+                    previewCanvas.style.display = 'none';
+                    
+                    // Create img to display the GIF
+                    const img = new Image();
+                    img.src = gifUrl;
+                    img.className = 'output-image';
+                    img.style.border = '1px solid #ccc';
+                    
+                    resultDiv.innerHTML = `
+                        <h2>Your Generated GIF</h2>
+                        <img src="${gifUrl}" alt="Generated GIF" class="output-image" style="border: 1px solid #ccc;">
+                        <div class="download-section">
+                            <button id="downloadBtn" class="btn btn-primary">
+                                ⬇️ Download GIF
+                            </button>
+                            <button id="newBtn" class="btn btn-secondary">
+                                🔄 Generate Another
+                            </button>
+                        </div>
+                    `;
+
+                    document.getElementById('downloadBtn').addEventListener('click', handleDownload);
+                    document.getElementById('newBtn').addEventListener('click', resetForm);
+
+                    hideLoading();
+                    resultDiv.style.display = 'block';
+                    errorDiv.style.display = 'none';
+                });
+
+                // Render the GIF
+                gif.render();
+
+            } catch (error) {
+                hideLoading();
+                showError(`GIF Generation failed: ${error.message}`);
+            }
+        }
+
+        /**
+         * Handle GIF download
+         */
+        function handleDownload() {
+            if (!currentGif) {
+                showError('No GIF to download');
+                return;
+            }
+
+            const url = URL.createObjectURL(currentGif);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `prompt-to-gif-${Date.now()}.gif`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        }
+
+        /**
+         * Reset form to initial state
+         */
+        function resetForm() {
+            gifForm.reset();
+            framesInput.value = 5;
+            durationInput.value = 100;
+            animationInput.value = 'pulse';
+            resultDiv.style.display = 'none';
+            errorDiv.style.display = 'none';
+            promptInput.focus();
+        }
+
+        /**
+         * Show loading spinner
+         */
+        function showLoading(message = 'Processing...') {
+            loadingText.textContent = message;
+            loadingDiv.style.display = 'block';
+            generateBtn.disabled = true;
+        }
+
+        /**
+         * Hide loading spinner
+         */
+        function hideLoading() {
+            loadingDiv.style.display = 'none';
+            generateBtn.disabled = false;
+        }
+
+        /**
+         * Show error message
+         */
+        function showError(message) {
+            errorText.textContent = message;
+            errorDiv.style.display = 'block';
+            console.error('Error:', message);
+        }
+
+        /**
+         * Hide error message
+         */
+        function hideError() {
+            errorDiv.style.display = 'none';
+        }
+
+        // Focus on prompt input on load
+        window.addEventListener('load', () => {
+            promptInput.focus();
+        });
+    </script>
+</body>
+</html>
