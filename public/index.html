@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prompt to GIF Generator</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎬 Prompt to GIF Generator</h1>
+            <p>Transform your imagination into animated GIFs with AI</p>
+        </header>
+
+        <main>
+            <section class="input-section">
+                <form id="gifForm">
+                    <div class="form-group">
+                        <label for="prompt">Enter Your Prompt:</label>
+                        <textarea 
+                            id="prompt" 
+                            placeholder="Describe what you want to see... (e.g., 'A cat dancing in the rain')"
+                            rows="3"
+                            required
+                        ></textarea>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="frames">Number of Frames:</label>
+                            <input 
+                                type="number" 
+                                id="frames" 
+                                min="2" 
+                                max="10" 
+                                value="5"
+                            >
+                        </div>
+
+                        <div class="form-group">
+                            <label for="duration">Frame Duration (ms):</label>
+                            <input 
+                                type="number" 
+                                id="duration" 
+                                min="50" 
+                                max="500" 
+                                value="100"
+                                step="10"
+                            >
+                        </div>
+
+                        <div class="form-group">
+                            <label for="resolution">Resolution:</label>
+                            <select id="resolution">
+                                <option value="256">256x256</option>
+                                <option value="512" selected>512x512</option>
+                                <option value="768">768x768</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="button-group">
+                        <button type="button" id="previewBtn" class="btn btn-secondary">
+                            👁️ Preview
+                        </button>
+                        <button type="submit" id="generateBtn" class="btn btn-primary">
+                            ✨ Generate GIF
+                        </button>
+                    </div>
+                </form>
+            </section>
+
+            <section class="output-section">
+                <div id="preview" class="preview-container" style="display: none;">
+                    <h2>Preview</h2>
+                    <img id="previewImage" src="" alt="Preview" class="output-image">
+                </div>
+
+                <div id="loading" class="loading" style="display: none;">
+                    <div class="spinner"></div>
+                    <p id="loadingText">Generating your GIF...</p>
+                </div>
+
+                <div id="result" class="result-container" style="display: none;">
+                    <h2>Your Generated GIF</h2>
+                    <img id="outputGif" src="" alt="Generated GIF" class="output-image">
+                    <div class="download-section">
+                        <button id="downloadBtn" class="btn btn-primary">
+                            ⬇️ Download GIF
+                        </button>
+                        <button id="newBtn" class="btn btn-secondary">
+                            🔄 Generate Another
+                        </button>
+                    </div>
+                </div>
+
+                <div id="error" class="error-message" style="display: none;">
+                    <p id="errorText"></p>
+                    <button onclick="hideError()" class="btn btn-small">Dismiss</button>
+                </div>
+            </section>
+        </main>
+
+        <footer>
+            <p>Made with ❤️ by prompt-to-gif | Built with Express.js & Canvas</p>
+        </footer>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
