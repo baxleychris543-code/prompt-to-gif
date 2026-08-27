@@ -31,6 +31,11 @@ header h1 {
 header p {
     font-size: 1.1em;
     opacity: 0.9;
+    margin-bottom: 20px;
+}
+
+.header-buttons {
+    margin-top: 15px;
 }
 
 main {
@@ -123,6 +128,18 @@ main {
 
 .btn-secondary:hover:not(:disabled) {
     background: #d0d0d0;
+}
+
+.btn-download {
+    background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+    color: white;
+    padding: 10px 20px;
+    font-size: 0.95em;
+}
+
+.btn-download:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 20px rgba(17, 153, 142, 0.4);
 }
 
 .btn-small {
@@ -227,5 +244,9 @@ footer {
 
     .button-group {
         flex-direction: column;
+    }
+
+    .btn-download {
+        width: 100%;
     }
 }
